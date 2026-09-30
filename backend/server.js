@@ -27,6 +27,7 @@ app.use('/api/payments', require('./routes/payments'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/students', require('./routes/students'));
 app.use('/api/classes', require('./routes/classes'));
+app.use('/api/charges', require('./routes/charges'));
 // List of all students with their fee totals.
 // Optional filters: /api/students?class=Class 1&status=pending
 app.get('/api/students', async (req, res) => {
