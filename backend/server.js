@@ -24,13 +24,16 @@ app.get('/health', async (req, res) => {
 });
 
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/payments', require('./routes/payments'));
+app.use('/api/students', require('./routes/students'));
+app.use('/api/classes', require('./routes/classes'));
 // List of all students with their fee totals.
 // Optional filters: /api/students?class=Class 1&status=pending
 app.get('/api/students', async (req, res) => {
   try {
     const settings = await getSettings();
     const students = await loadStudents();
-    let list = students.map((s) => {
+        let list = students.filter((s) => s.is_active || req.query.includeInactive === 'true').map((s) => {
       const f = getFeeSummary(s, settings);
       return {
         id: s.id, name: s.name, rollNumber: s.roll_number, class: s.class_name,
