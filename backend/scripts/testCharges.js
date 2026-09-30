@@ -12,7 +12,7 @@ let passed = 0, failed = 0;
 async function call(method, url, body) {
   const res = await fetch(base + url, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + require('jsonwebtoken').sign({ username: 'test' }, process.env.JWT_SECRET) },
     body: body ? JSON.stringify(body) : undefined,
   });
   return { status: res.status, data: await res.json() };

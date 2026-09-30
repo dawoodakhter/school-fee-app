@@ -4,6 +4,7 @@ const cors = require('cors');
 const pool = require('./db');
 const { loadStudents, getSettings } = require('./studentData');
 const { getFeeSummary } = require('./feeCalc');
+const { requireLogin } = require('./auth');
 
 const app = express();
 app.use(cors());
@@ -16,14 +17,15 @@ app.get('/', (req, res) => {
 app.get('/health', async (req, res) => {
   try {
     const result = await pool.query('SELECT COUNT(*) FROM students');
-    res.json({ database: 'connected', students: Number(result.rows[0].count) });
+       res.json({ database: 'connected' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ database: 'error', message: err.message });
   }
 });
 
-app.use('/api/payments', require('./routes/payments'));
+app.use('/api/auth', require('./routes/auth')); // login (open to everyone)
+app.use('/api', requireLogin); // everything below this line needs a login
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/students', require('./routes/students'));
 app.use('/api/classes', require('./routes/classes'));
