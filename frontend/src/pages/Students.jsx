@@ -13,12 +13,16 @@ export default function Students() {
   const [search, setSearch] = useState('')
   const [classFilter, setClassFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [showLeft, setShowLeft] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
-        const [c, s] = await Promise.all([api('/classes'), api('/students')])
+        const [c, s] = await Promise.all([
+          api('/classes'),
+          api(showLeft ? '/students?includeInactive=true' : '/students'),
+        ])
         if (cancelled) return
         setClasses(c.classes)
         setStudents(s.students)
@@ -32,7 +36,7 @@ export default function Students() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [showLeft])
 
   const shown = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -48,7 +52,10 @@ export default function Students() {
 
   return (
     <main className="page">
-      <h2>Students</h2>
+      <div className="page-head">
+        <h2>Students</h2>
+        <Link to="/students/new" className="button">Add student</Link>
+      </div>
 
       {loading && <p className="muted">Loading...</p>}
       {error && <p className="error" role="alert">{error}</p>}
@@ -76,6 +83,11 @@ export default function Students() {
             </select>
           </div>
 
+          <label className="check">
+            <input type="checkbox" checked={showLeft} onChange={(e) => setShowLeft(e.target.checked)} />
+            Also show students who have left
+          </label>
+
           <p className="muted" data-testid="summary">
             Showing {shown.length} of {students.length} students. Remaining: {money(remainingShown)}
           </p>
@@ -95,9 +107,12 @@ export default function Students() {
               </thead>
               <tbody>
                 {shown.map((s) => (
-                  <tr key={s.id}>
+                  <tr key={s.id} className={s.isActive === false ? 'row-left' : ''}>
                     <td>{s.rollNumber}</td>
-                    <td><Link to={`/students/${s.id}`}>{s.name}</Link></td>
+                    <td>
+                      <Link to={`/students/${s.id}`}>{s.name}</Link>
+                      {s.isActive === false && <span className="left-tag">Left</span>}
+                    </td>
                     <td>{s.class}</td>
                     <td>{money(s.totalDue)}</td>
                     <td>{money(s.totalPaid)}</td>

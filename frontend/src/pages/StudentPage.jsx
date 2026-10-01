@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { money, monthLabel, today } from '../format'
 import Badge from '../components/Badge'
@@ -22,6 +22,7 @@ export default function StudentPage() {
 }
 
 function StudentView({ id }) {
+  const navigate = useNavigate()
   const [student, setStudent] = useState(null)
   const [fees, setFees] = useState(null)
   const [payments, setPayments] = useState([])
@@ -120,6 +121,31 @@ function StudentView({ id }) {
     }
   }
 
+  async function markAsLeft() {
+    const ok = window.confirm(`Mark ${student.name} as left the school? Their payment history is kept.`)
+    if (!ok) return
+    setFormError('')
+    setMessage('')
+    try {
+      await api(`/students/${id}`, { method: 'DELETE' })
+      navigate('/students')
+    } catch (err) {
+      setFormError(err.message)
+    }
+  }
+
+  async function restore() {
+    setFormError('')
+    setMessage('')
+    try {
+      await api(`/students/${id}`, { method: 'PUT', body: { isActive: true } })
+      setMessage('Student is back in the school list')
+      reload()
+    } catch (err) {
+      setFormError(err.message)
+    }
+  }
+
   if (loading) return <main className="page"><p className="muted">Loading...</p></main>
 
   if (error || !student || !fees) {
@@ -138,7 +164,18 @@ function StudentView({ id }) {
       <div className="title-row">
         <h2>{student.name}</h2>
         <Badge status={fees.status} />
+        <div className="title-actions">
+          <Link to={`/students/${id}/edit`} className="button secondary">Edit</Link>
+          {student.isActive ? (
+            <button className="danger" onClick={markAsLeft}>Mark as left</button>
+          ) : (
+            <button onClick={restore}>Restore student</button>
+          )}
+        </div>
       </div>
+      {!student.isActive && (
+        <p className="left-note" role="status">This student has left the school.</p>
+      )}
       <p className="muted">
         {student.class} &middot; Roll {student.rollNumber}
         {student.section ? ` · Section ${student.section}` : ''}
@@ -158,7 +195,8 @@ function StudentView({ id }) {
         <div className="card stat"><span className="muted">Whole year</span><strong>{money(fees.fullYearDue)}</strong></div>
       </div>
 
-      <h3>Record a payment</h3>
+      {student.isActive && <h3>Record a payment</h3>}
+      {student.isActive && (
       <form className="card pay-form" onSubmit={savePayment}>
         <div>
           <label htmlFor="pay-month">Month</label>
@@ -196,6 +234,7 @@ function StudentView({ id }) {
         </div>
         <button type="submit" disabled={busy || !form.amount}>{busy ? 'Saving...' : 'Save payment'}</button>
       </form>
+      )}
       {formError && <p className="error" role="alert">{formError}</p>}
       {message && <p className="success" role="status">{message}</p>}
 

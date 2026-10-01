@@ -42,7 +42,7 @@ app.get('/api/students', async (req, res) => {
         id: s.id, name: s.name, rollNumber: s.roll_number, class: s.class_name,
         section: s.section, concession: s.concession,
         totalDue: f.totalDue, totalPaid: f.totalPaid, remaining: f.remaining,
-        status: f.status,
+               status: f.status, isActive: s.is_active,
       };
     });
     if (req.query.class) list = list.filter((s) => s.class === req.query.class);
