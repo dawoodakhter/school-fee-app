@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
+import { money } from '../format'
 
-const money = (n) => 'PKR ' + Number(n || 0).toLocaleString()
-
-export default function Dashboard({ onLogout }) {
+export default function Dashboard() {
   const [classes, setClasses] = useState([])
   const [students, setStudents] = useState([])
   const [error, setError] = useState('')
@@ -34,11 +33,6 @@ export default function Dashboard({ onLogout }) {
 
   return (
     <div>
-      <header className="topbar">
-        <strong>School Fee Manager</strong>
-        <button className="secondary" onClick={onLogout}>Log out</button>
-      </header>
-
       <main className="page">
         <h2>Dashboard</h2>
 

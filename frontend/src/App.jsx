@@ -1,7 +1,20 @@
 import { useEffect, useState } from 'react'
+import { Link, Route, Routes } from 'react-router-dom'
 import { getToken, clearToken } from './api'
+import Layout from './components/Layout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import Students from './pages/Students'
+import StudentPage from './pages/StudentPage'
+
+function NotFound() {
+  return (
+    <main className="page">
+      <h2>Page not found</h2>
+      <p><Link to="/">Back to the dashboard</Link></p>
+    </main>
+  )
+}
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(Boolean(getToken()))
@@ -19,5 +32,15 @@ export default function App() {
   }
 
   if (!loggedIn) return <Login onLoggedIn={() => setLoggedIn(true)} />
-  return <Dashboard onLogout={logout} />
+
+  return (
+    <Routes>
+      <Route element={<Layout onLogout={logout} />}>
+        <Route index element={<Dashboard />} />
+        <Route path="students" element={<Students />} />
+        <Route path="students/:id" element={<StudentPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  )
 }

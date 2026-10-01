@@ -93,3 +93,54 @@ table {
 }
 th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* ---- menu, filters, badges, forms (added for the students screens) ---- */
+.brand { display: flex; align-items: center; gap: 24px; }
+nav { display: flex; gap: 6px; }
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+nav a:hover { background: #eef2f6; }
+nav a.active { background: #e3edff; color: var(--brand-dark); font-weight: 600; }
+a { color: var(--brand); }
+
+select {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 15px;
+  background: #fff;
+  width: 100%;
+  margin: 4px 0 14px;
+}
+
+.filters { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 4px; }
+@media (max-width: 640px) { .filters { grid-template-columns: 1fr; } }
+
+.title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.title-row h2 { margin: 0; }
+
+.badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.s-paid { background: #dcf5e7; color: var(--good); }
+.s-partial { background: #fdf0d2; color: var(--warn); }
+.s-pending { background: #fbe0dc; color: var(--bad); }
+.s-upcoming { background: #e9edf2; color: var(--muted); }
+.s-na { background: transparent; color: var(--muted); }
+
+.pay-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0 12px;
+  align-items: end;
+  margin-bottom: 8px;
+}
+.pay-form button { margin-bottom: 14px; }
+.success { color: var(--good); margin: 8px 0; }
+button.danger { background: #fbe0dc; color: var(--bad); }
+button.danger:hover:not(:disabled) { background: #f6c9c3; }
+button.small { padding: 4px 10px; font-size: 13px; }
+tr.row-future td { color: var(--muted); }
