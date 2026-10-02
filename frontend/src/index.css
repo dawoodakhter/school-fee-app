@@ -175,3 +175,7 @@ a.button.secondary:hover { background: #dde3ea; }
 }
 tr.row-left td { color: var(--muted); }
 .left-note { background: #fdf0d2; color: var(--warn); padding: 8px 12px; border-radius: 8px; }
+
+/* ---- charges ---- */
+.inline-pay { display: inline-flex; gap: 6px; align-items: center; }
+.inline-pay input { width: 100px; margin: 0; padding: 4px 8px; }

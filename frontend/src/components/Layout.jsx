@@ -9,6 +9,7 @@ export default function Layout({ onLogout }) {
           <nav>
             <NavLink to="/" end>Dashboard</NavLink>
             <NavLink to="/students">Students</NavLink>
+            <NavLink to="/charges">Charges</NavLink>
           </nav>
         </div>
         <button className="secondary" onClick={onLogout}>Log out</button>

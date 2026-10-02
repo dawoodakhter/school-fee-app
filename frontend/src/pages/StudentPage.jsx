@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
 import { money, monthLabel, today } from '../format'
 import Badge from '../components/Badge'
+import ChargesPanel from '../components/ChargesPanel'
+import OneTimePanel from '../components/OneTimePanel'
 
 const dash = (n) => (n ? money(n) : '-')
 
@@ -238,6 +240,18 @@ function StudentView({ id }) {
       {formError && <p className="error" role="alert">{formError}</p>}
       {message && <p className="success" role="status">{message}</p>}
 
+            {student.isActive && (
+        <ChargesPanel
+          studentId={id}
+          months={fees.months}
+          onSaved={(text) => {
+            setFormError('')
+            setMessage(text)
+            reload()
+          }}
+        />
+      )}
+      {student.isActive && <OneTimePanel studentId={id} onChanged={reload} />}
       <h3>Fee card</h3>
       <div className="table-wrap">
         <table>
