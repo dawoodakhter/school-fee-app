@@ -31,6 +31,7 @@ app.use('/api/students', require('./routes/students'));
 app.use('/api/classes', require('./routes/classes'));
 app.use('/api/charges', require('./routes/charges'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/reports', require('./routes/reports'));
 // List of all students with their fee totals.
 // Optional filters: /api/students?class=Class 1&status=pending
 app.get('/api/students', async (req, res) => {
@@ -43,7 +44,8 @@ app.get('/api/students', async (req, res) => {
         id: s.id, name: s.name, rollNumber: s.roll_number, class: s.class_name,
         section: s.section, concession: s.concession,
         totalDue: f.totalDue, totalPaid: f.totalPaid, remaining: f.remaining,
-               status: f.status, isActive: s.is_active,
+                       status: f.status, isActive: s.is_active,
+        guardianName: s.guardian_name, contactNumber: s.contact_number,
       };
     });
     if (req.query.class) list = list.filter((s) => s.class === req.query.class);

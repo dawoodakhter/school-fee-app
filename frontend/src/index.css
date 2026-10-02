@@ -179,3 +179,28 @@ tr.row-left td { color: var(--muted); }
 /* ---- charges ---- */
 .inline-pay { display: inline-flex; gap: 6px; align-items: center; }
 .inline-pay input { width: 100px; margin: 0; padding: 4px 8px; }
+
+/* ---- reports and printing ---- */
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.tab {
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px 8px 0 0;
+  padding: 8px 16px;
+}
+.tab:hover:not(:disabled) { background: #eef2f6; }
+.tab.active { background: #e3edff; color: var(--brand-dark); font-weight: 600; }
+.report-actions { display: flex; gap: 8px; margin: 8px 0 12px; }
+.print-only { display: none; }
+
+@media print {
+  .no-print { display: none !important; }
+  .print-only { display: block; }
+  :root { background: #fff; }
+  body { background: #fff; }
+  .page { max-width: none; padding: 0; }
+  .card { border: 1px solid #999; }
+  table { font-size: 12px; }
+  th, td { padding: 4px 6px; white-space: normal; }
+  a { color: inherit; text-decoration: none; }
+}
