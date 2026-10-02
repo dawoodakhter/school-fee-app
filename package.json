@@ -1,0 +1,13 @@
+{
+  "name": "school-fee-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "School fee management app: React + Express + PostgreSQL",
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend --include=dev && npm run build --prefix frontend",
+    "start": "node backend/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
