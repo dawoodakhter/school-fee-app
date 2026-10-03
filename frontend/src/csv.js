@@ -15,9 +15,9 @@ export function toCsv(columns, rows) {
   return lines.join('\r\n')
 }
 
-export function downloadCsv(filename, text) {
-  // the first character makes Excel show non-English names correctly
-  const blob = new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8' })
+// Saves text as a file on your computer.
+export function downloadFile(filename, text, type) {
+  const blob = new Blob([text], { type })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -26,4 +26,9 @@ export function downloadCsv(filename, text) {
   link.click()
   link.remove()
   URL.revokeObjectURL(url)
+}
+
+export function downloadCsv(filename, text) {
+  // the first character makes Excel show non-English names correctly
+  downloadFile(filename, '\ufeff' + text, 'text/csv;charset=utf-8')
 }

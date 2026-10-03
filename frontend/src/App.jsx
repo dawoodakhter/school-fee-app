@@ -9,6 +9,7 @@ import StudentPage from './pages/StudentPage'
 import StudentForm from './pages/StudentForm'
 import Charges from './pages/Charges'
 import Reports from './pages/Reports'
+import Settings from './pages/Settings'
 
 function NotFound() {
   return (
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="students/:id/edit" element={<StudentForm />} />
         <Route path="charges" element={<Charges />} />
                 <Route path="reports" element={<Reports />} />
+                        <Route path="settings" element={<Settings />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

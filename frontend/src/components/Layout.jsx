@@ -11,6 +11,7 @@ export default function Layout({ onLogout }) {
             <NavLink to="/students">Students</NavLink>
             <NavLink to="/charges">Charges</NavLink>
             <NavLink to="/reports">Reports</NavLink>
+            <NavLink to="/settings">Settings</NavLink>
           </nav>
         </div>
         <button className="secondary" onClick={onLogout}>Log out</button>
