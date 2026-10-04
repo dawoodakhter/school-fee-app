@@ -38,7 +38,7 @@ export async function api(path, { method = 'GET', body } = {}) {
 
   if (!res.ok) {
     // a saved login that has expired: go back to the login screen
-    if (res.status === 401 && token) {
+    if (res.status === 401 && token && !path.startsWith('/auth/')) {
       clearToken()
       window.dispatchEvent(new Event('auth-expired'))
     }

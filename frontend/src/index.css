@@ -204,3 +204,9 @@ tr.row-left td { color: var(--muted); }
   th, td { padding: 4px 6px; white-space: normal; }
   a { color: inherit; text-decoration: none; }
 }
+
+/* ---- settings ---- */
+.from-month { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.from-month select { width: auto; margin: 0; padding: 4px 8px; }
+td input { margin: 0; padding: 6px 8px; width: 140px; }
+section { margin-bottom: 8px; }
