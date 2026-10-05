@@ -9,6 +9,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const pool = require('../db');
 const { checkBackup } = require('../backup');
+const { saveBackupFile, backupFileName, FILE_PATTERN } = require('../backupFiles');
 
 const base = `http://localhost:${process.env.PORT || 5000}`;
 const token = require('jsonwebtoken').sign({ username: 'test' }, process.env.JWT_SECRET);
@@ -64,6 +65,34 @@ async function main() {
   check('the backup command saves one file with the same counts',
     fromScript && JSON.stringify(fromScript.counts) === JSON.stringify(b.counts), { files });
   fs.rmSync(folder, { recursive: true, force: true });
+
+  // ---------- saving backup files (only uses temporary folders) ----------
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fee-files-'));
+  const folder2 = path.join(root, 'backups');
+  const drive = path.join(root, 'drive');
+  fs.mkdirSync(drive);
+  const sample = { app: 'x', counts: {} };
+
+  check('backup files are named with the date and time',
+    backupFileName(new Date(2026, 9, 3, 9, 5)) === 'school-fee-backup-2026-10-03_09-05.json');
+  const one = saveBackupFile(sample, folder2, { date: new Date(2026, 9, 3, 9, 5) });
+  check('a backup file is saved, and the folder is made if it is missing',
+    fs.existsSync(one.file) && fs.readdirSync(folder2).length === 1 && !one.copiedTo && !one.copyProblem, one);
+  const two = saveBackupFile(sample, folder2, { copyDir: drive, date: new Date(2026, 9, 3, 9, 6) });
+  check('a second copy can go to another folder (for example Google Drive or a USB stick)',
+    two.copiedTo && fs.existsSync(path.join(drive, 'school-fee-backup-2026-10-03_09-06.json')), two);
+  const three = saveBackupFile(sample, folder2, { copyDir: path.join(root, 'no-such-folder'), date: new Date(2026, 9, 3, 9, 7) });
+  check('if the second folder is missing, the backup is still saved and you get a warning',
+    three.copyProblem && !three.copiedTo && fs.existsSync(three.file), three);
+
+  fs.writeFileSync(path.join(folder2, 'notes.txt'), 'keep me');
+  for (let minute = 10; minute < 20; minute++) saveBackupFile(sample, folder2, { keep: 5, date: new Date(2026, 9, 3, 9, minute) });
+  const kept = fs.readdirSync(folder2).filter((n) => FILE_PATTERN.test(n)).sort();
+  check('only the newest backups are kept, older ones are removed',
+    kept.length === 5 && kept[0] === 'school-fee-backup-2026-10-03_09-15.json' && kept[4] === 'school-fee-backup-2026-10-03_09-19.json', kept);
+  check('other files in the backups folder are never deleted', fs.existsSync(path.join(folder2, 'notes.txt')));
+  check('the second copies are never deleted', fs.readdirSync(drive).length === 1);
+  fs.rmSync(root, { recursive: true, force: true });
 
   console.log(`\n${passed} passed, ${failed} failed`);
 }

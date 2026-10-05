@@ -7,11 +7,13 @@ const pool = require('./db');
 const { loadStudents, getSettings } = require('./studentData');
 const { getFeeSummary } = require('./feeCalc');
 const { requireLogin } = require('./auth');
+const { lanAddresses } = require('./network');
 
 const app = express();
 
-// When the app runs online it sits behind the hosting company's server.
-app.set('trust proxy', 1);
+// Only trust the "forwarded" headers when the app really sits behind a proxy (set TRUST_PROXY=1 in .env then).
+// Inside an office network there is no proxy, and trusting them would let anyone fake their address.
+app.set('trust proxy', process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : false);
 
 // Safety headers on every answer. (The "upgrade insecure requests" rule is off so the app also works on http://localhost.)
 app.use(
@@ -90,7 +92,8 @@ app.use('/api', (req, res) => {
 
 // If the website has been built (frontend/dist), serve it from here too.
 const dist = path.join(__dirname, '..', 'frontend', 'dist');
-if (fs.existsSync(path.join(dist, 'index.html'))) {
+const siteBuilt = fs.existsSync(path.join(dist, 'index.html'));
+if (siteBuilt) {
   app.use(express.static(dist));
   // every other page address belongs to the website (it shows the right screen itself)
   app.get(/^\/(?!api(\/|$)|health$).*/, (req, res) => {
@@ -112,4 +115,27 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log('Server running on port ' + PORT));
+// HOST is optional. HOST=127.0.0.1 in .env lets only THIS computer open the app.
+const HOST = process.env.HOST;
+
+function started() {
+  console.log('Server running on port ' + PORT);
+  if (!siteBuilt) return; // while you are programming, the website runs separately (npm run dev)
+  console.log('');
+  console.log('The school fee app is ready. Open it on this computer:');
+  console.log('   http://localhost:' + PORT);
+  if (HOST === '127.0.0.1' || HOST === 'localhost') {
+    console.log('Only this computer can open it (HOST is set in .env).');
+  } else {
+    const addresses = lanAddresses();
+    if (addresses.length > 0) {
+      console.log('Other computers on the same network can open:');
+      for (const ip of addresses) console.log('   http://' + ip + ':' + PORT);
+    }
+  }
+  console.log('');
+  console.log('Keep this window open while you use the app. Close it to stop the app.');
+}
+
+if (HOST) app.listen(PORT, HOST, started);
+else app.listen(PORT, started);
