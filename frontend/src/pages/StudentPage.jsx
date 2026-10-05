@@ -40,6 +40,7 @@ function StudentView({ id }) {
   const [formError, setFormError] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+  const [lastPaymentId, setLastPaymentId] = useState(null)
 
   const [reloadKey, setReloadKey] = useState(0)
   const reload = () => setReloadKey((k) => k + 1)
@@ -89,7 +90,7 @@ function StudentView({ id }) {
     }
     setBusy(true)
     try {
-      await api('/payments', {
+      const created = await api('/payments', {
         method: 'POST',
         body: {
           studentId: Number(id),
@@ -100,6 +101,7 @@ function StudentView({ id }) {
         },
       })
       localStorage.setItem('fee_received_by', form.receivedBy)
+      setLastPaymentId(created.id)
       setMessage(`Saved: ${money(amount)} for ${monthLabel(form.month)}`)
       reload()
     } catch (err) {
@@ -117,6 +119,7 @@ function StudentView({ id }) {
     try {
       await api(`/payments/${payment.id}`, { method: 'DELETE' })
       setMessage('Payment deleted')
+      setLastPaymentId(null)
       reload()
     } catch (err) {
       setFormError(err.message)
@@ -238,9 +241,19 @@ function StudentView({ id }) {
       </form>
       )}
       {formError && <p className="error" role="alert">{formError}</p>}
-      {message && <p className="success" role="status">{message}</p>}
+      {message && (
+        <p className="success" role="status">
+          {message}
+          {lastPaymentId && (
+            <>
+              {' '}
+              <Link to={`/receipts/${lastPaymentId}`}>Print receipt</Link>
+            </>
+          )}
+        </p>
+      )}
 
-            {student.isActive && (
+      {student.isActive && (
         <ChargesPanel
           studentId={id}
           months={fees.months}
@@ -252,6 +265,7 @@ function StudentView({ id }) {
         />
       )}
       {student.isActive && <OneTimePanel studentId={id} onChanged={reload} />}
+
       <h3>Fee card</h3>
       <div className="table-wrap">
         <table>
@@ -304,7 +318,12 @@ function StudentView({ id }) {
                   <td>{monthLabel(p.month)}</td>
                   <td>{money(p.amount)}</td>
                   <td>{p.receivedBy || '-'}</td>
-                  <td><button className="danger small" onClick={() => removePayment(p)}>Delete</button></td>
+                  <td>
+                    <span className="inline-pay">
+                      <Link to={`/receipts/${p.id}`} className="button secondary small">Receipt</Link>
+                      <button className="danger small" onClick={() => removePayment(p)}>Delete</button>
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>

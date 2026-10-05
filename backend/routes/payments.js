@@ -1,8 +1,8 @@
 // Payment routes: record a payment, list payments, undo a payment.
 const express = require('express');
 const pool = require('../db');
-const { getSettings } = require('../studentData');
-const { getMonthsBetween } = require('../feeCalc');
+const { getSettings, loadStudents } = require('../studentData');
+const { getMonthsBetween, getFeeSummary } = require('../feeCalc');
 
 const router = express.Router();
 
@@ -68,6 +68,51 @@ router.get('/', async (req, res) => {
   }
 });
 
+// RECEIPT for one payment: /api/payments/5/receipt
+// It has everything printed on a receipt. The balance is the balance at the moment you ask.
+router.get('/:id/receipt', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ message: 'Bad payment id' });
+
+    const p = await pool.query(
+      `SELECT id, student_id AS "studentId", to_char(paid_on, 'YYYY-MM-DD') AS "paidOn",
+              month, amount, received_by AS "receivedBy"
+       FROM payments WHERE id = $1`, [id]);
+    if (p.rowCount === 0) return res.status(404).json({ message: 'Payment not found' });
+    const payment = p.rows[0];
+
+    const found = await loadStudents(payment.studentId);
+    const settings = await getSettings();
+    const fees = getFeeSummary(found[0], settings);
+    const school = await pool.query(
+      "SELECT key, value FROM settings WHERE key IN ('school_name', 'school_address', 'school_phone')");
+    const s = Object.fromEntries(school.rows.map((r) => [r.key, r.value]));
+
+    res.json({
+      receipt: {
+        number: 'R-' + String(payment.id).padStart(6, '0'),
+        id: payment.id,
+        paidOn: payment.paidOn,
+        month: payment.month.trim(),
+        amount: payment.amount,
+        receivedBy: payment.receivedBy,
+      },
+      student: {
+        id: found[0].id,
+        name: found[0].name,
+        rollNumber: found[0].roll_number,
+        class: found[0].class_name,
+        guardianName: found[0].guardian_name,
+      },
+      school: { name: s.school_name || '', address: s.school_address || '', phone: s.school_phone || '' },
+      balance: { totalDue: fees.totalDue, totalPaid: fees.totalPaid, remaining: fees.remaining },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
 // UNDO (delete) one payment by its id: DELETE /api/payments/5
 router.delete('/:id', async (req, res) => {
   try {
