@@ -1,11 +1,24 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { api } from '../api'
 
 export default function Layout({ onLogout }) {
+  const [schoolName, setSchoolName] = useState('Al Hira Public School')
+
+  useEffect(() => {
+    api('/settings')
+      .then((s) => {
+        if (s && s.schoolName) setSchoolName(s.schoolName)
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <div>
       <header className="topbar no-print">
         <div className="brand">
-          <strong>School Fee Manager</strong>
+          <img className="logo" src="/logo.jpg" alt="" />
+          <strong>{schoolName}</strong>
           <nav>
             <NavLink to="/" end>Dashboard</NavLink>
             <NavLink to="/students">Students</NavLink>

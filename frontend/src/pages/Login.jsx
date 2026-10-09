@@ -25,8 +25,9 @@ export default function Login({ onLoggedIn }) {
   return (
     <div className="login-page">
       <form className="card login-card" onSubmit={handleSubmit}>
-        <h1>School Fee Manager</h1>
-        <p className="muted">Admin login</p>
+        <img className="login-logo" src="/logo.jpg" alt="" />
+        <h1>Al Hira Public School</h1>
+        <p className="muted">Fee Management - Admin login</p>
 
         <label htmlFor="username">Username</label>
         <input
