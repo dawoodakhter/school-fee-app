@@ -21,7 +21,7 @@ app.use(
     contentSecurityPolicy: { useDefaults: true, directives: { 'upgrade-insecure-requests': null } },
   })
 );
-app.use(express.json({ limit: '100kb' }));
+app.use(express.json({ limit: '2mb' })); // big enough for a spreadsheet of a few thousand students
 
 app.get('/health', async (req, res) => {
   try {
@@ -36,6 +36,7 @@ app.get('/health', async (req, res) => {
 app.use('/api/auth', require('./routes/auth')); // login (open to everyone)
 app.use('/api', requireLogin); // everything below this line needs a login
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/students', require('./routes/studentImport')); // must come before the next line
 app.use('/api/students', require('./routes/students'));
 app.use('/api/classes', require('./routes/classes'));
 app.use('/api/charges', require('./routes/charges'));

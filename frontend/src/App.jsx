@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Students from './pages/Students'
 import StudentPage from './pages/StudentPage'
 import StudentForm from './pages/StudentForm'
+import ImportStudents from './pages/ImportStudents'
 import Charges from './pages/Charges'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
@@ -44,12 +45,13 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="students" element={<Students />} />
         <Route path="students/new" element={<StudentForm />} />
+        <Route path="students/import" element={<ImportStudents />} />
         <Route path="students/:id" element={<StudentPage />} />
         <Route path="students/:id/edit" element={<StudentForm />} />
         <Route path="charges" element={<Charges />} />
-                <Route path="reports" element={<Reports />} />
-                        <Route path="settings" element={<Settings />} />
-                                <Route path="receipts/:id" element={<Receipt />} />
+        <Route path="reports" element={<Reports />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="receipts/:id" element={<Receipt />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

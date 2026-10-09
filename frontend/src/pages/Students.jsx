@@ -54,7 +54,13 @@ export default function Students() {
     <main className="page">
       <div className="page-head">
         <h2>Students</h2>
-        <Link to="/students/new" className="button">Add student</Link>
+               <div className="head-buttons">
+          <Link to="/students/import" className="button secondary">Import / export</Link>
+                 <div className="head-buttons">
+          <Link to="/students/import" className="button secondary">Import / export</Link>
+          <Link to="/students/new" className="button">Add student</Link>
+        </div>
+        </div>
       </div>
 
       {loading && <p className="muted">Loading...</p>}
