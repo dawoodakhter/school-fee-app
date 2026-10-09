@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the payment routes. It starts the server itself, so stop your own server first.
 // Run: node scripts/testPayments.js
 require('dotenv').config();

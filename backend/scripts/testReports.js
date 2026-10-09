@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the report route. It starts the server itself, so stop your own server first.
 // Run: node scripts/testReports.js
 // It adds 3 test payments and removes them again at the end.

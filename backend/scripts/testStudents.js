@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests adding, editing and deactivating students. It starts the server itself,
 // so stop your own server first. Run: node scripts/testStudents.js
 // It creates 2 test students and deletes them again at the end.

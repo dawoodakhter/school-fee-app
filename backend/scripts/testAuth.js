@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the login. It starts the server itself, so stop your own server first.
 // Run: node scripts/testAuth.js
 // It makes a temporary test login and deletes it at the end. Your real admin is not touched.

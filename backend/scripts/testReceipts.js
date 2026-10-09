@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the receipt route. It makes its own test class and test student (so your real students are never
 // touched) and removes them at the end. It starts the server itself, so stop your own server first.
 // Run: node scripts/testReceipts.js

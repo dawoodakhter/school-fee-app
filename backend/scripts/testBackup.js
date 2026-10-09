@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the backup. It only READS your data, so it is safe on your real database.
 // It starts the server itself, so stop your own server first.
 // Run: node scripts/testBackup.js

@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the extra-charge routes (stationary, exam, misc fund, one-time charges).
 // It starts the server itself, so stop your own server first.
 // Run: node scripts/testCharges.js

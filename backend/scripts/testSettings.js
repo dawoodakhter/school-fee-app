@@ -1,3 +1,4 @@
+require('./testGuard');
 // Tests the settings, class fees and billing period.
 // It creates its own test class ("ZZ Test Class") and test students, so your real classes and students are never
 // touched, and it removes them at the end. It starts the server itself, so stop your own server first.
