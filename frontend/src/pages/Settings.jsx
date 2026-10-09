@@ -3,6 +3,7 @@ import ClassesPanel from '../components/ClassesPanel'
 import BillingPanel from '../components/BillingPanel'
 import PasswordPanel from '../components/PasswordPanel'
 import BackupPanel from '../components/BackupPanel'
+import NewSessionPanel from '../components/NewSessionPanel'
 
 export default function Settings() {
   return (
@@ -13,6 +14,7 @@ export default function Settings() {
       <BillingPanel />
       <PasswordPanel />
       <BackupPanel />
+      <NewSessionPanel />
     </main>
   )
 }

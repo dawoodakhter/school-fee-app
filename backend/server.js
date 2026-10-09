@@ -43,6 +43,7 @@ app.use('/api/charges', require('./routes/charges'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/backup', require('./routes/backup'));
+app.use('/api/new-session', require('./routes/newSession'));
 
 // List of all students with their fee totals.
 // Optional filters: /api/students?class=Class 1&status=pending
