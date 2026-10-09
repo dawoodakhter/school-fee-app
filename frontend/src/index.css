@@ -307,3 +307,14 @@ button:not(.secondary):hover,
 button:not(.secondary):disabled {
   color: #ffffff !important;
 }
+/* ---- Dashboard cards ---- */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 14px 0; }
+.stat { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; border-left: 5px solid var(--brand); }
+.stat .muted { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat strong { font-size: 26px; color: var(--brand); }
+.stat strong.good { color: #15803d; }
+.stat strong.warn { color: #b45309; }
+.stat strong.bad { color: #b91c1c; }
+.progress-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.progress { background: #e5e7eb; border-radius: 999px; height: 14px; overflow: hidden; }
+.progress > div { height: 100%; background: linear-gradient(90deg, var(--brand), var(--accent)); border-radius: 999px; }

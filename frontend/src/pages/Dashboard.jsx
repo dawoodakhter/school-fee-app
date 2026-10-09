@@ -75,6 +75,28 @@ export default function Dashboard() {
               </div>
             </div>
 
+                       <section>
+              <div className="progress-head">
+                <strong>Fees collected so far</strong>
+                <span>
+                  {sum(students, 'totalDue') > 0
+                    ? Math.round((sum(students, 'totalPaid') / sum(students, 'totalDue')) * 100)
+                    : 0}
+                  %
+                </span>
+              </div>
+              <div className="progress">
+                <div
+                  style={{
+                    width:
+                      (sum(students, 'totalDue') > 0
+                        ? Math.min(100, Math.round((sum(students, 'totalPaid') / sum(students, 'totalDue')) * 100))
+                        : 0) + '%',
+                  }}
+                />
+              </div>
+            </section>
+
             <h3>Classes</h3>
             <div className="table-wrap">
               <table>
