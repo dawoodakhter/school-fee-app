@@ -12,6 +12,7 @@ import Charges from './pages/Charges'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Receipt from './pages/Receipt'
+import Challans from './pages/Challans'
 
 function NotFound() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
         <Route path="reports" element={<Reports />} />
         <Route path="settings" element={<Settings />} />
         <Route path="receipts/:id" element={<Receipt />} />
+                <Route path="challans" element={<Challans />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

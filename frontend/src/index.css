@@ -318,3 +318,39 @@ button:not(.secondary):disabled {
 .progress-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .progress { background: #e5e7eb; border-radius: 999px; height: 14px; overflow: hidden; }
 .progress > div { height: 100%; background: linear-gradient(90deg, var(--brand), var(--accent)); border-radius: 999px; }
+/* ---- Fee challans ---- */
+.challan { display: grid; grid-template-columns: 1fr 1fr; border: 1px dashed #555; margin: 0 0 14px; background: #fff; page-break-inside: avoid; break-inside: avoid; }
+.slip { padding: 10px 12px; font-size: 12px; }
+.slip + .slip { border-left: 1px dashed #555; }
+.slip-head { display: flex; gap: 8px; align-items: center; }
+.slip-head strong { font-size: 14px; }
+.slip .small { font-size: 10px; color: #4b5563; }
+.challan-logo { height: 34px; width: auto; filter: invert(1); mix-blend-mode: multiply; }
+.slip-title { margin: 6px 0; padding: 3px 0; text-align: center; font-weight: 700; background: #eef4ee; color: #14532d; }
+.slip-table { width: 100%; border-collapse: collapse; }
+.slip-table td { padding: 2px 4px; border: 0; background: transparent; }
+.slip-table td:first-child { color: #4b5563; width: 38%; }
+.slip-sign { margin-top: 12px; font-size: 11px; }
+@media print {
+  @page { size: A4; margin: 8mm; }
+  body { background: #fff; }
+  .challan { margin-bottom: 6mm; }
+}
+/* ---- Report tabs ---- */
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid #d5ddd5; margin-bottom: 14px; }
+.tabs button.tab,
+.tabs button.tab:hover,
+.tabs button.tab:disabled {
+  background: transparent;
+  color: #6b7280 !important;
+  border-radius: 8px 8px 0 0;
+  border: 0;
+  border-bottom: 3px solid transparent;
+}
+.tabs button.tab:hover { color: var(--brand) !important; background: #eef4ee; }
+.tabs button.tab.active,
+.tabs button.tab.active:hover {
+  background: #ffffff;
+  color: var(--brand) !important;
+  border-bottom: 3px solid var(--accent);
+}

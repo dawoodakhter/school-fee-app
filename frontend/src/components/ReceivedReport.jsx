@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { downloadCsv, toCsv } from '../csv'
@@ -19,8 +19,16 @@ export default function ReceivedReport() {
   const [to, setTo] = useState(today())
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [schoolName, setSchoolName] = useState('')
+  const [counted, setCounted] = useState('')
 
   const rangeProblem = !from || !to ? 'Choose both dates' : from > to ? 'The first date must not be after the second' : ''
+
+  useEffect(() => {
+    api('/settings')
+      .then((s) => setSchoolName((s && s.schoolName) || ''))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (rangeProblem) return undefined
@@ -50,11 +58,40 @@ export default function ReceivedReport() {
   // the answer on screen belongs to the dates in the boxes
   const shown = data && !rangeProblem && data.from === from && data.to === to ? data : null
   const loading = !rangeProblem && !error && !shown
-  const title = `Payments received, ${from} to ${to}`
+  const title = from === to ? `Daily closing, ${from}` : `Payments received, ${from} to ${to}`
+
+  // totals per class, worked out from the payments on screen
+  const byClass = useMemo(() => {
+    if (!shown) return []
+    const map = new Map()
+    for (const p of shown.payments) {
+      const row = map.get(p.class) || { name: p.class, count: 0, total: 0 }
+      row.count += 1
+      row.total += p.amount
+      map.set(p.class, row)
+    }
+    return [...map.values()]
+  }, [shown])
+
+  const countedNumber = counted === '' ? null : Number(counted)
+  const countedOk = countedNumber !== null && Number.isFinite(countedNumber) && countedNumber >= 0
+  const difference = shown && countedOk ? countedNumber - shown.total : null
+  const differenceText =
+    difference === null
+      ? ''
+      : difference === 0
+        ? 'Matches exactly'
+        : difference < 0
+          ? `Short by ${money(-difference)}`
+          : `Extra ${money(difference)}`
 
   return (
     <>
       <div className="print-only">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img className="challan-logo" src="/logo.jpg" alt="" />
+          <strong style={{ fontSize: 18 }}>{schoolName}</strong>
+        </div>
         <h2>{title}</h2>
         <p>Printed on {today()}</p>
       </div>
@@ -93,6 +130,33 @@ export default function ReceivedReport() {
             <div className="card stat"><span className="muted">Payments</span><strong>{shown.count}</strong></div>
           </div>
 
+          <section>
+            <h3>Cash check</h3>
+            <p className="muted no-print">
+              Count the money in the drawer and type it here. This assumes every payment was received as cash.
+            </p>
+            <div className="filters">
+              <label>
+                Cash counted
+                <input
+                  className="no-print"
+                  type="number"
+                  min="0"
+                  value={counted}
+                  onChange={(e) => setCounted(e.target.value)}
+                />
+              </label>
+            </div>
+            <p>
+              Expected: <strong>{money(shown.total)}</strong>
+              {countedOk && (
+                <>
+                  {' '}| Counted: <strong>{money(countedNumber)}</strong> | <strong>{differenceText}</strong>
+                </>
+              )}
+            </p>
+          </section>
+
           {shown.byReceiver.length > 0 && (
             <>
               <h3>By person</h3>
@@ -105,6 +169,26 @@ export default function ReceivedReport() {
                         <td>{r.receivedBy}</td>
                         <td>{r.count}</td>
                         <td>{money(r.total)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {byClass.length > 0 && (
+            <>
+              <h3>By class</h3>
+              <div className="table-wrap">
+                <table>
+                  <thead><tr><th>Class</th><th>Payments</th><th>Total</th></tr></thead>
+                  <tbody>
+                    {byClass.map((c) => (
+                      <tr key={c.name}>
+                        <td>{c.name}</td>
+                        <td>{c.count}</td>
+                        <td>{money(c.total)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -138,6 +222,11 @@ export default function ReceivedReport() {
             </table>
           </div>
           <p className="muted">One-time charges (like an admission fee) are not in this report.</p>
+
+          <div className="print-only" style={{ marginTop: 48 }}>
+            <span style={{ display: 'inline-block', width: '50%' }}>Prepared by: ______________</span>
+            <span style={{ display: 'inline-block', width: '50%' }}>Checked by: ______________</span>
+          </div>
         </>
       )}
     </>
