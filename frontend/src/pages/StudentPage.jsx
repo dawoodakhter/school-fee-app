@@ -111,14 +111,26 @@ function StudentView({ id }) {
     }
   }
 
-  async function removePayment(payment) {
+  
     const ok = window.confirm(`Delete this payment of ${money(payment.amount)} for ${monthLabel(payment.month)}?`)
     if (!ok) return
     setFormError('')
+    setMess
+      async function removePayment(payment) {
+    const reason = window.prompt(
+      `Cancel this payment of ${money(payment.amount)} for ${monthLabel(payment.month)}?\n\nWrite the reason (for example: entered the wrong amount):`,
+    )
+    if (reason === null) return
+    if (reason.trim().length < 3) {
+      setMessage('')
+      setFormError('A reason is required to cancel a payment')
+      return
+    }
+    setFormError('')
     setMessage('')
     try {
-      await api(`/payments/${payment.id}`, { method: 'DELETE' })
-      setMessage('Payment deleted')
+      await api(`/payments/${payment.id}`, { method: 'DELETE', body: { reason: reason.trim() } })
+      setMessage('Payment cancelled. It is recorded in Reports, Cancelled payments.')
       setLastPaymentId(null)
       reload()
     } catch (err) {
@@ -321,7 +333,7 @@ function StudentView({ id }) {
                   <td>
                     <span className="inline-pay">
                       <Link to={`/receipts/${p.id}`} className="button secondary small">Receipt</Link>
-                      <button className="danger small" onClick={() => removePayment(p)}>Delete</button>
+                      <button className="danger small" onClick={() => removePayment(p)}>Cancel payment</button>
                     </span>
                   </td>
                 </tr>

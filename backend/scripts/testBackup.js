@@ -29,8 +29,10 @@ function check(label, ok, extra) {
 }
 
 async function count(table) {
-  const r = await pool.query(`SELECT COUNT(*)::int AS n FROM ${table}`);
-  return r.rows[0].n;
+  try {
+    const r = await pool.query(`SELECT COUNT(*)::int AS n FROM ${table}`);
+    return r.rows[0].n;
+  } catch (e) { return 0; } // the cancelled_payments table is made the first time it is needed
 }
 
 async function main() {
@@ -45,9 +47,9 @@ async function main() {
   check('it is sent as a file to save', /attachment; filename="school-fee-backup-\d{4}-\d{2}-\d{2}\.json"/.test(res.headers.get('content-disposition') || ''), res.headers.get('content-disposition'));
 
   let ok = true;
-  for (const table of ['classes', 'students', 'monthly_fees', 'payments', 'one_time_charges', 'settings']) {
+  for (const table of ['classes', 'students', 'monthly_fees', 'payments', 'one_time_charges', 'settings', 'cancelled_payments']) {
     const inDb = await count(table);
-    if (b.counts[table] !== inDb || b.tables[table].length !== inDb) ok = false;
+    if ((b.counts[table] || 0) !== inDb || (b.tables[table] || []).length !== inDb) ok = false;
   }
   check('every table in the backup has exactly as many rows as the database', ok, b.counts);
 

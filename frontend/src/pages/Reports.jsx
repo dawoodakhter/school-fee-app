@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import OwedReport from '../components/OwedReport'
 import ReceivedReport from '../components/ReceivedReport'
+import CancelledReport from '../components/CancelledReport'
 
 export default function Reports() {
   const [tab, setTab] = useState('owed')
@@ -26,9 +27,19 @@ export default function Reports() {
         >
           Payments received
         </button>
+        <button
+          role="tab"
+          aria-selected={tab === 'cancelled'}
+          className={tab === 'cancelled' ? 'tab active' : 'tab'}
+          onClick={() => setTab('cancelled')}
+        >
+          Cancelled payments
+        </button>
       </div>
 
-      {tab === 'owed' ? <OwedReport /> : <ReceivedReport />}
+      {tab === 'owed' && <OwedReport />}
+      {tab === 'received' && <ReceivedReport />}
+      {tab === 'cancelled' && <CancelledReport />}
     </main>
   )
 }

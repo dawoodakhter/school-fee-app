@@ -1,13 +1,35 @@
-// Backup and restore of all the school data (classes, students, fees, payments, charges, settings).
+// Backup and restore of all the school data (classes, students, fees, payments, charges, settings,
+// and the record of cancelled payments).
 // The login users are NOT in the backup, so a backup file never contains passwords.
 
 const TABLES = ['classes', 'students', 'monthly_fees', 'payments', 'one_time_charges', 'settings'];
+// Tables that older backup files do not have. They are saved when present, and a backup without them is still valid.
+const OPTIONAL_TABLES = ['cancelled_payments'];
+const ALL_TABLES = [...TABLES, ...OPTIONAL_TABLES];
 const APP_NAME = 'school-fee-manager';
+
+// Same table as in routes/payments.js. Created when missing, so old databases work too.
+const CANCELLED_SQL = `
+  CREATE TABLE IF NOT EXISTS cancelled_payments (
+    id SERIAL PRIMARY KEY,
+    payment_id INTEGER NOT NULL,
+    student_id INTEGER,
+    student_name TEXT NOT NULL,
+    class_name TEXT,
+    roll_number TEXT,
+    month CHAR(7) NOT NULL,
+    amount INTEGER NOT NULL,
+    paid_on DATE,
+    received_by TEXT,
+    reason TEXT NOT NULL,
+    cancelled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  )`;
 
 // db can be a pool or a client
 async function makeBackup(db) {
+  await db.query(CANCELLED_SQL);
   const tables = {};
-  for (const name of TABLES) {
+  for (const name of ALL_TABLES) {
     const order = name === 'settings' ? 'x.key' : 'x.id';
     // row_to_json writes dates as plain text like 2026-09-30, so nothing shifts with time zones
     const r = await db.query(
@@ -16,7 +38,7 @@ async function makeBackup(db) {
     tables[name] = r.rows[0].rows;
   }
   const counts = {};
-  for (const name of TABLES) counts[name] = tables[name].length;
+  for (const name of ALL_TABLES) counts[name] = tables[name].length;
   return { app: APP_NAME, formatVersion: 1, createdAt: new Date().toISOString(), counts, tables };
 }
 
@@ -27,7 +49,9 @@ function checkBackup(data) {
   }
   if (data.formatVersion !== 1) throw new Error('This backup has a version this program does not know');
   if (!data.tables || typeof data.tables !== 'object') throw new Error('The backup has no tables');
-  for (const name of TABLES) {
+  for (const name of ALL_TABLES) {
+    const optional = OPTIONAL_TABLES.includes(name);
+    if (optional && data.tables[name] === undefined) continue;
     if (!Array.isArray(data.tables[name])) throw new Error(`The backup is missing the "${name}" table`);
     if (!data.tables[name].every((row) => row && typeof row === 'object' && !Array.isArray(row))) {
       throw new Error(`The "${name}" table in the backup has a broken row`);
@@ -40,18 +64,20 @@ async function restoreBackup(client, data) {
   checkBackup(data);
   await client.query('BEGIN');
   try {
+    await client.query(CANCELLED_SQL);
     await client.query(
-      'TRUNCATE payments, monthly_fees, one_time_charges, students, classes, settings RESTART IDENTITY CASCADE'
+      `TRUNCATE payments, monthly_fees, one_time_charges, students, classes, settings, cancelled_payments
+       RESTART IDENTITY CASCADE`
     );
-    for (const name of TABLES) {
-      const rows = data.tables[name];
+    for (const name of ALL_TABLES) {
+      const rows = data.tables[name] || [];
       if (rows.length === 0) continue;
       await client.query(`INSERT INTO ${name} SELECT * FROM jsonb_populate_recordset(null::${name}, $1::jsonb)`, [
         JSON.stringify(rows),
       ]);
     }
     // the next new student, payment... must get a number after the biggest one restored
-    for (const name of TABLES.filter((t) => t !== 'settings')) {
+    for (const name of ALL_TABLES.filter((t) => t !== 'settings')) {
       await client.query(
         `SELECT setval(pg_get_serial_sequence('${name}', 'id'),
                        GREATEST(COALESCE((SELECT MAX(id) FROM ${name}), 0), 1),
@@ -65,4 +91,4 @@ async function restoreBackup(client, data) {
   }
 }
 
-module.exports = { TABLES, makeBackup, checkBackup, restoreBackup };
+module.exports = { TABLES, OPTIONAL_TABLES, makeBackup, checkBackup, restoreBackup };

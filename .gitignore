@@ -1,4 +1,6 @@
 node_modules
 .env
 data/
-backups/
+backups/school-fee-backup-*.json
+school_fee_data.json
+backend/.env
