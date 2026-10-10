@@ -112,10 +112,6 @@ function StudentView({ id }) {
   }
 
   
-    const ok = window.confirm(`Delete this payment of ${money(payment.amount)} for ${monthLabel(payment.month)}?`)
-    if (!ok) return
-    setFormError('')
-    setMess
       async function removePayment(payment) {
     const reason = window.prompt(
       `Cancel this payment of ${money(payment.amount)} for ${monthLabel(payment.month)}?\n\nWrite the reason (for example: entered the wrong amount):`,

@@ -29,6 +29,21 @@ A full-stack fee management app, built for a real school (Al Hira Public School)
 - Imports, restores and the new-session switch run in a single database transaction: they finish completely or not at all.
 - Tests are protected by a guard that refuses to run on a database holding real school data.
 
+## Screenshots
+
+All screenshots use fake demo data.
+
+| Dashboard | Students |
+|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Students](docs/screenshots/students.png) |
+
+| Student fee card | Fee challans |
+|---|---|
+| ![Fee card](docs/screenshots/student.png) | ![Challans](docs/screenshots/challans.png) |
+
+| Cancelled payments report | Settings |
+|---|---|
+| ![Reports](docs/screenshots/reports.png) | ![Settings](docs/screenshots/settings.png) |
 ## Run it
 
 1. Install Node.js and create a PostgreSQL database (a free Neon project works).
