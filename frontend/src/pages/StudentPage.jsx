@@ -5,6 +5,7 @@ import { money, monthLabel, today } from '../format'
 import Badge from '../components/Badge'
 import ChargesPanel from '../components/ChargesPanel'
 import OneTimePanel from '../components/OneTimePanel'
+import Dialog from '../components/Dialog'
 
 const dash = (n) => (n ? money(n) : '-')
 
@@ -41,6 +42,7 @@ function StudentView({ id }) {
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [lastPaymentId, setLastPaymentId] = useState(null)
+    const [dialog, setDialog] = useState(null)
 
   const [reloadKey, setReloadKey] = useState(0)
   const reload = () => setReloadKey((k) => k + 1)
@@ -112,20 +114,23 @@ function StudentView({ id }) {
   }
 
   
-      async function removePayment(payment) {
-    const reason = window.prompt(
-      `Cancel this payment of ${money(payment.amount)} for ${monthLabel(payment.month)}?\n\nWrite the reason (for example: entered the wrong amount):`,
-    )
-    if (reason === null) return
-    if (reason.trim().length < 3) {
-      setMessage('')
-      setFormError('A reason is required to cancel a payment')
-      return
-    }
+       function removePayment(payment) {
+    setDialog({
+      title: 'Cancel this payment?',
+      message: `${money(payment.amount)} for ${monthLabel(payment.month)}. It is removed from the fee card and kept in Reports, Cancelled payments.`,
+      askReason: true,
+      confirmText: 'Cancel payment',
+      danger: true,
+      onConfirm: (reason) => doCancel(payment, reason),
+    })
+  }
+
+  async function doCancel(payment, reason) {
+    setDialog(null)
     setFormError('')
     setMessage('')
     try {
-      await api(`/payments/${payment.id}`, { method: 'DELETE', body: { reason: reason.trim() } })
+      await api(`/payments/${payment.id}`, { method: 'DELETE', body: { reason } })
       setMessage('Payment cancelled. It is recorded in Reports, Cancelled payments.')
       setLastPaymentId(null)
       reload()
@@ -134,9 +139,18 @@ function StudentView({ id }) {
     }
   }
 
-  async function markAsLeft() {
-    const ok = window.confirm(`Mark ${student.name} as left the school? Their payment history is kept.`)
-    if (!ok) return
+  function markAsLeft() {
+    setDialog({
+      title: 'Mark as left?',
+      message: `${student.name} will be marked as left the school. Their payment history is kept.`,
+      confirmText: 'Mark as left',
+      danger: true,
+      onConfirm: doMarkAsLeft,
+    })
+  }
+
+  async function doMarkAsLeft() {
+    setDialog(null)
     setFormError('')
     setMessage('')
     try {
@@ -146,7 +160,6 @@ function StudentView({ id }) {
       setFormError(err.message)
     }
   }
-
   async function restore() {
     setFormError('')
     setMessage('')
@@ -337,7 +350,9 @@ function StudentView({ id }) {
             </tbody>
           </table>
         </div>
+           
       )}
+       {dialog && <Dialog {...dialog} onCancel={() => setDialog(null)} />}
     </main>
   )
 }
