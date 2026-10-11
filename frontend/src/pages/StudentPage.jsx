@@ -182,6 +182,8 @@ function StudentView({ id }) {
       </main>
     )
   }
+    const selectedRow = fees.months.find((m) => m.month === form.month)
+  const owedNow = selectedRow ? Math.max(0, selectedRow.due - selectedRow.paid) : 0
 
   return (
     <main className="page">
@@ -233,6 +235,7 @@ function StudentView({ id }) {
           </select>
         </div>
         <div>
+                  <div>
           <label htmlFor="pay-amount">Amount (PKR)</label>
           <input
             id="pay-amount"
@@ -240,6 +243,17 @@ function StudentView({ id }) {
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
           />
+          {owedNow > 0 && (
+            <div className="quick-amounts">
+              <button type="button" className="secondary small" onClick={() => setForm({ ...form, amount: String(owedNow) })}>
+                Full {money(owedNow)}
+              </button>
+              <button type="button" className="secondary small" onClick={() => setForm({ ...form, amount: String(Math.round(owedNow / 2)) })}>
+                Half
+              </button>
+            </div>
+          )}
+        </div>
         </div>
         <div>
           <label htmlFor="pay-date">Date</label>

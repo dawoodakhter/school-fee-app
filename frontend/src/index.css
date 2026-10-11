@@ -382,3 +382,68 @@ button:not(.secondary):disabled {
   margin-top: 16px;
 }
 .dialog p { white-space: pre-line; }
+.quick-amounts {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+/* ---- Phone view ---- */
+@media (max-width: 700px) {
+  .page { padding: 14px 12px 32px; }
+  h2 { font-size: 20px; }
+
+  /* top bar: logo and name on top, menu scrolls sideways */
+  .topbar { flex-wrap: wrap; padding: 8px 12px; gap: 6px; }
+  .brand { flex-wrap: wrap; gap: 8px; width: 100%; }
+  nav { width: 100%; overflow-x: auto; flex-wrap: nowrap; gap: 4px; padding-bottom: 4px; }
+  nav a { white-space: nowrap; flex: 0 0 auto; padding: 8px 12px; }
+
+  /* headings and button rows wrap instead of overflowing */
+  .title-row, .page-head, .head-buttons, .report-actions, .receipt-actions { flex-wrap: wrap; gap: 8px; }
+  .title-actions { margin-left: 0; width: 100%; }
+
+  /* easy to tap, and no automatic zoom when typing */
+  button, a.button { min-height: 44px; }
+  button.small, a.button.small { min-height: 36px; }
+  input, select, textarea { font-size: 16px; }
+
+  /* forms: one column, full-width buttons */
+  .pay-form, .form-grid { grid-template-columns: 1fr; }
+  .pay-form button { width: 100%; }
+  td input { width: 110px; }
+
+  /* tables scroll sideways inside their box */
+  th, td { padding: 8px 10px; }
+  .tabs { overflow-x: auto; }
+  .stat strong { font-size: 22px; }
+
+  /* receipts */
+  .receipt { padding: 14px; }
+  .receipt-head { flex-direction: column; }
+  .receipt-grid { grid-template-columns: 1fr; }
+
+  /* dialog: stacked, full-width buttons */
+  .dialog-actions { flex-direction: column-reverse; }
+  .dialog-actions button { width: 100%; }
+}
+.pay-form .quick-amounts button {
+  width: auto;
+  flex: 1;
+  margin-bottom: 0;
+}
+/* Log out button: one line, small, and in the top-right corner on phones */
+.topbar button { white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .topbar { position: relative; }
+  .topbar button {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  .brand { padding-right: 92px; }
+}
