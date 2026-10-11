@@ -447,3 +447,37 @@ button:not(.secondary):disabled {
   }
   .brand { padding-right: 92px; }
 }
+/* ---- Phone polish ---- */
+@media (max-width: 700px) {
+  /* tighter filters */
+  .filters { gap: 0; }
+  .filters select, .filters input { margin: 2px 0 10px; }
+  .check { margin: 4px 0 10px; }
+
+  /* even tabs */
+  .tabs { gap: 2px; }
+  .tabs button.tab { flex: 1; padding: 8px 6px; font-size: 14px; line-height: 1.2; }
+
+  /* tables: smaller, tighter, long names wrap */
+  .table-wrap table { font-size: 14px; }
+  .table-wrap th, .table-wrap td { padding: 8px 8px; }
+  .table-wrap th { font-size: 11px; letter-spacing: 0.02em; }
+  .table-wrap td a { white-space: normal; display: inline-block; min-width: 110px; }
+
+  /* a soft shadow on the right edge shows the table scrolls */
+  .table-wrap {
+    background:
+      linear-gradient(to right, #fff 30%, rgba(255, 255, 255, 0)) left center / 24px 100% no-repeat local,
+      linear-gradient(to left, #fff 30%, rgba(255, 255, 255, 0)) right center / 24px 100% no-repeat local,
+      linear-gradient(to left, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0)) right center / 10px 100% no-repeat scroll,
+      #fff;
+  }
+}
+@media (max-width: 700px) {
+  /* the menu may use the full width, below the Log out button */
+  nav {
+    width: calc(100% + 92px);
+    margin-right: -92px;
+    padding-right: 12px;
+  }
+}
