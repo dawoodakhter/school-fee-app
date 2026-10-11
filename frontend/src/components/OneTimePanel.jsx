@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { money } from '../format'
+import useConfirm from '../useConfirm'
 
 export default function OneTimePanel({ studentId, onChanged }) {
   const [charges, setCharges] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [version, setVersion] = useState(0)
+    const [ask, dialog] = useConfirm()
 
   const [name, setName] = useState('')
   const [amount, setAmount] = useState('')
@@ -71,7 +73,13 @@ export default function OneTimePanel({ studentId, onChanged }) {
   }
 
   async function remove(charge) {
-    if (!window.confirm(`Remove the charge "${charge.name}" of ${money(charge.amount)}?`)) return
+       const ok = await ask({
+      title: 'Remove this charge?',
+      message: `Remove the charge "${charge.name}" of ${money(charge.amount)}?`,
+      confirmText: 'Remove charge',
+      danger: true,
+    })
+    if (!ok) return
     setError('')
     try {
       await api(`/charges/one-time/${charge.id}`, { method: 'DELETE' })
@@ -139,6 +147,7 @@ export default function OneTimePanel({ studentId, onChanged }) {
         <button type="submit">Add charge</button>
       </form>
       {error && <p className="error" role="alert">{error}</p>}
+         {dialog}
     </>
   )
 }

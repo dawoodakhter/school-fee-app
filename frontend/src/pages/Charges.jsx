@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { money, monthLabel, today } from '../format'
+import useConfirm from '../useConfirm'
 
 const FIELD_NAMES = { exam: 'exam fee', stationary: 'stationary charge', miscFund: 'misc fund' }
 
@@ -17,6 +18,7 @@ export default function Charges() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+    const [ask, dialog] = useConfirm()
 
   useEffect(() => {
     let cancelled = false
@@ -58,7 +60,13 @@ export default function Charges() {
         ? `Clear the ${what} for ${count} students (${where}) in ${monthLabel(month)}?`
         : `Set the ${what} to ${money(n)} for ${count} students (${where}) in ${monthLabel(month)}? ` +
           `This replaces any ${what} already entered for that month.`
-    if (!window.confirm(question)) return
+        const ok = await ask({
+      title: 'Apply this charge?',
+      message: question,
+      confirmText: 'Apply',
+      danger: true,
+    })
+    if (!ok) return
 
     setBusy(true)
     try {
@@ -119,6 +127,7 @@ export default function Charges() {
       <p className="muted">Enter 0 to clear a charge.</p>
       {error && <p className="error" role="alert">{error}</p>}
       {message && <p className="success" role="status">{message}</p>}
+         {dialog}
     </main>
   )
 }

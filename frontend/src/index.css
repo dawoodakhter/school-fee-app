@@ -381,3 +381,4 @@ button:not(.secondary):disabled {
   gap: 8px;
   margin-top: 16px;
 }
+.dialog p { white-space: pre-line; }

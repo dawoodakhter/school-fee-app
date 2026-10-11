@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { monthLabel, monthsBetween } from '../format'
+import useConfirm from '../useConfirm'
 
 export default function BillingPanel() {
   const [current, setCurrent] = useState(null)
@@ -10,6 +11,7 @@ export default function BillingPanel() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
+    const [ask, dialog] = useConfirm()
 
   useEffect(() => {
     let cancelled = false
@@ -48,7 +50,13 @@ export default function BillingPanel() {
     } else {
       question += ' This cannot be undone.'
     }
-    if (!window.confirm(question)) return
+       const yes = await ask({
+      title: 'Make the billing period longer?',
+      message: question,
+      confirmText: 'Yes, make it longer',
+      danger: true,
+    })
+    if (!yes) return
 
     setBusy(true)
     try {
@@ -87,6 +95,7 @@ export default function BillingPanel() {
       )}
       {error && <p className="error" role="alert">{error}</p>}
       {message && <p className="success" role="status">{message}</p>}
+         {dialog}
     </section>
   )
 }

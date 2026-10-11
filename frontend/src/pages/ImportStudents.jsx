@@ -5,6 +5,7 @@ import { downloadCsv, toCsv } from '../csv'
 import { parseCsv } from '../csvParse'
 import { COLUMNS, EXPORT_COLUMNS, LABELS, readTable } from '../studentColumns'
 import { today } from '../format'
+import useConfirm from '../useConfirm'
 
 const MAX_ROWS = 3000
 const SHOW = 100
@@ -18,6 +19,7 @@ export default function ImportStudents() {
   const [problem, setProblem] = useState('')
   const [busy, setBusy] = useState('')
   const [done, setDone] = useState(null)
+    const [ask, dialog] = useConfirm()
 
   function reset() {
     setFileName('')
@@ -86,10 +88,13 @@ export default function ImportStudents() {
 
   async function apply() {
     const { create, update } = check.summary
-    const ok = window.confirm(
-      `Save ${create} new ${create === 1 ? 'student' : 'students'} and ${update} ${update === 1 ? 'update' : 'updates'}?\n\n` +
+       const ok = await ask({
+      title: 'Save these changes?',
+      message:
+        `Save ${create} new ${create === 1 ? 'student' : 'students'} and ${update} ${update === 1 ? 'update' : 'updates'}?\n\n` +
         'Tip: you can download a backup in Settings first.',
-    )
+      confirmText: 'Save changes',
+    })
     if (!ok) return
     setProblem('')
     setBusy('saving')
@@ -235,6 +240,7 @@ export default function ImportStudents() {
       )}
 
       {done && <button className="secondary" onClick={reset}>Import another file</button>}
+         {dialog}
     </main>
   )
 }

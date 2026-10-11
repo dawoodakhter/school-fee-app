@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { money, monthLabel, today } from '../format'
+import useConfirm from '../useConfirm'
 
 export default function ClassesPanel() {
   const [classes, setClasses] = useState([])
@@ -9,6 +10,7 @@ export default function ClassesPanel() {
   const [version, setVersion] = useState(0)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+    const [ask, dialog] = useConfirm()
 
   const [editingId, setEditingId] = useState(null)
   const [edit, setEdit] = useState({ name: '', fee: '', from: '' })
@@ -62,10 +64,13 @@ export default function ClassesPanel() {
     }
     if (Object.keys(body).length === 0) return setError('Nothing changed')
     if (body.monthlyFee !== undefined) {
-      const ok = window.confirm(
-        `Change the monthly fee of ${c.name} from ${money(c.monthlyFee)} to ${money(fee)}, starting ${monthLabel(edit.from)}?\n\n` +
+      const ok = await ask({
+        title: 'Change the monthly fee?',
+        message:
+          `Change the monthly fee of ${c.name} from ${money(c.monthlyFee)} to ${money(fee)}, starting ${monthLabel(edit.from)}?\n\n` +
           'Earlier months, months that already have a payment, and students with their own custom fee keep what they have.',
-      )
+        confirmText: 'Change the fee',
+      })
       if (!ok) return
     }
     try {
@@ -83,7 +88,13 @@ export default function ClassesPanel() {
   }
 
   async function removeClass(c) {
-    if (!window.confirm(`Remove the class "${c.name}"? This only works when it has no students.`)) return
+        const ok = await ask({
+      title: 'Remove this class?',
+      message: `Remove the class "${c.name}"? This only works when it has no students.`,
+      confirmText: 'Remove class',
+      danger: true,
+    })
+    if (!ok) return
     setError('')
     setMessage('')
     try {
@@ -198,6 +209,7 @@ export default function ClassesPanel() {
       </form>
       {error && <p className="error" role="alert">{error}</p>}
       {message && <p className="success" role="status">{message}</p>}
+          {dialog}
     </section>
   )
 }
